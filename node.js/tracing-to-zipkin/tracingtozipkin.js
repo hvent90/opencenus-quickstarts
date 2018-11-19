@@ -13,17 +13,17 @@ tracer.registerSpanEventListener(new zipkin.ZipkinTraceExporter({
 }));
 
 function main() {
-  // 4. Create a scoped span, a scoped span will automatically end when closed.
+  // 4. Create a span. A span must be closed.
   tracer.startRootSpan({name: 'main'}, rootSpan => {
     for (let i = 0; i < 10; i++) {
-      doWork(i);
+      doWork();
     }
 
     rootSpan.end();
   });
 }
 
-function doWork(i) {
+function doWork() {
   // 5. Start another span. In this example, the main method already started a span,
   // so that'll be the parent span, and this will be a child span.
   const span = tracer.startChildSpan('doWork');
@@ -31,7 +31,7 @@ function doWork(i) {
 
   try {
     console.log('doing busy work');
-    for (let i = 0; i <= 999999999; i++) {}
+    for (let i = 0; i <= 999999999; i++) {} // short delay
   } catch (err) {
   }
 
