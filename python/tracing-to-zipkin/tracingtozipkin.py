@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 
 import os
+from datetime import datetime
 import time
 import sys
 
 from opencensus.trace.tracer import Tracer
+from opencensus.trace import time_event as time_event_module
 from opencensus.trace.exporters.zipkin_exporter import ZipkinExporter
 from opencensus.trace.samplers import always_on
 
@@ -27,9 +29,16 @@ def main():
 def doWork():
     # 5. Start another span. Because this is within the scope of the "main" span,
     # this will automatically be a child span.
-    with tracer.span(name="doWork"):
+    with tracer.span(name="doWork") as span:
         print("doing busy work")
-        time.sleep(0.1)
+        try:
+            time.sleep(0.1)
+        except:
+            # 6. Set status upon error
+            span.status = Status(5, "Error occurred")
+
+        # 7. Annotate our span to capture metadata about our operation
+        span.add_annotation("invoking doWork")
 
 if __name__ == "__main__":
     main()

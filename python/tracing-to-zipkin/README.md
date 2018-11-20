@@ -82,3 +82,17 @@ def doWork():
         print("doing busy work")
         time.sleep(0.1)
 ```
+
+#### Set the Status of the span
+We can set the [status](https://opencensus.io/tracing/span/status/) of our span to create more observability of our traced operations.
+```py
+# 6. Set status upon error
+span.status = Status(5, "Error occurred")
+```
+
+#### Create an Annotation
+An [annotation](https://opencensus.io/tracing/span/time_events/annotation/) tells a descriptive story in text of an event that occurred during a span’s lifetime.
+```py
+# 7. Annotate our span to capture metadata about our operation
+span.add_annotation("invoking doWork")
+```
