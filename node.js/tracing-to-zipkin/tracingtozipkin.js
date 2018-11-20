@@ -29,11 +29,12 @@ function doWork() {
   const span = tracer.startChildSpan('doWork');
   span.start();
 
-  try {
-    console.log('doing busy work');
-    for (let i = 0; i <= 999999999; i++) {} // short delay
-  } catch (err) {
-  }
+  console.log('doing busy work');
+  for (let i = 0; i <= 40000000; i++) {} // short delay
+
+  // 6. Annotate our span to capture metadata about our operation
+  span.addAnnotation('invoking doWork')
+  for (let i = 0; i <= 20000000; i++) {} // short delay
 
   span.end();
 }

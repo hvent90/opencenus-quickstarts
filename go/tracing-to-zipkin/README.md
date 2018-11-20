@@ -117,7 +117,7 @@ span.SetStatus(trace.Status{
 ```
 
 #### Create an Annotation
-An annotation tells a descriptive story in text of an event that occurred during a span’s lifetime.
+An [annotation](https://opencensus.io/tracing/span/time_events/annotation/) tells a descriptive story in text of an event that occurred during a span’s lifetime.
 ```go
 // 7. Annotate our span to capture metadata about our operation
 span.Annotate([]trace.Attribute{

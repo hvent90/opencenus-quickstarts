@@ -125,3 +125,10 @@ span.end();
 // 6b. End the spans
 rootSpan.end();
 ```
+
+#### Create an Annotation
+An [annotation](https://opencensus.io/tracing/span/time_events/annotation/) tells a descriptive story in text of an event that occurred during a span’s lifetime.
+```js
+// 6. Annotate our span to capture metadata about our operation
+span.addAnnotation('invoking doWork')
+```
