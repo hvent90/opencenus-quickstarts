@@ -13,10 +13,6 @@
 
 ### How does it work?
 ```js
-const tracing = require('@opencensus/nodejs');
-const zipkin = require('@opencensus/exporter-zipkin');
-const stdin = process.openStdin();
-
 // 1. Get the global singleton Tracer object
 // 2. Configure 100% sample rate, otherwise, few traces will be sampled.
 const tracer = tracing.start({samplingRate: 1}).tracer;
@@ -38,24 +34,6 @@ function main() {
     rootSpan.end();
   });
 }
-
-function doWork(i) {
-  // 5. Start another span. In this example, the main method already started a span,
-  // so that'll be the parent span, and this will be a child span.
-  const span = tracer.startChildSpan('doWork');
-  span.start();
-
-  try {
-    console.log('doing busy work');
-    for (let i = 0; i <= 999999999; i++) {}
-  } catch (err) {
-  }
-
-  // 6a. End the spans
-  span.end();
-}
-
-main();
 ```
 
 #### Using the Tracer
@@ -100,17 +78,18 @@ tracer.startRootSpan({name: 'main'}, rootSpan => {
 #### Create a child span
 The `main` method calls `doWork` a number of times. Each invocation also generates a child span. Take a look at the `doWork` method.
 ```js
-function doWork(i) {
+function doWork() {
   // 5. Start another span. In this example, the main method already started a span,
   // so that'll be the parent span, and this will be a child span.
   const span = tracer.startChildSpan('doWork');
   span.start();
 
-  try {
-    console.log('doing busy work');
-    for (let i = 0; i <= 999999999; i++) {}
-  } catch (err) {
-  }
+  console.log('doing busy work');
+  for (let i = 0; i <= 40000000; i++) {} // short delay
+
+  // 6. Annotate our span to capture metadata about our operation
+  span.addAnnotation('invoking doWork')
+  for (let i = 0; i <= 20000000; i++) {} // short delay
 
   span.end();
 }
