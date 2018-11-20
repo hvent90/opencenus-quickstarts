@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"encoding/binary"
 	"fmt"
 	"log"
 	"time"
@@ -45,5 +47,20 @@ func doWork(ctx context.Context) {
 	defer span.End()
 
 	fmt.Println("doing busy work")
-	time.Sleep(100 * time.Millisecond)
+	time.Sleep(80 * time.Millisecond)
+	buf := bytes.NewBuffer([]byte{0xFF, 0x00, 0x00, 0x00})
+	num, err := binary.ReadVarint(buf)
+	if err != nil {
+		// 6. Set status upon error
+		span.SetStatus(trace.Status{
+			Code:    trace.StatusCodeUnknown,
+			Message: err.Error(),
+		})
+	}
+
+	// 7. Annotate our span to capture metadata about our operation
+	span.Annotate([]trace.Attribute{
+		trace.Int64Attribute("bytes to int", num),
+	}, "Invoking doWork")
+	time.Sleep(20 * time.Millisecond)
 }

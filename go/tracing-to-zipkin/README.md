@@ -77,7 +77,22 @@ func doWork(ctx context.Context) {
 	defer span.End()
 
 	fmt.Println("doing busy work")
-	time.Sleep(100 * time.Millisecond)
+	time.Sleep(80 * time.Millisecond)
+	buf := bytes.NewBuffer([]byte{0xFF, 0x00, 0x00, 0x00})
+	num, err := binary.ReadVarint(buf)
+	if err != nil {
+		// 6. Set status upon error
+		span.SetStatus(trace.Status{
+			Code:    trace.StatusCodeUnknown,
+			Message: err.Error(),
+		})
+	}
+
+	// 7. Annotate our span to capture metadata about our operation
+	span.Annotate([]trace.Attribute{
+		trace.Int64Attribute("bytes to int", num),
+	}, "Invoking doWork")
+	time.Sleep(20 * time.Millisecond)
 }
 ```
 
@@ -89,4 +104,23 @@ defer span.End()
 
 // 5b. Make the span close at the end of this function.
 defer span.End()
+```
+
+#### Set the Status of the span
+We can set the [status](https://opencensus.io/tracing/span/status/) of our span to create more observability of our traced operations.
+```go
+// 6. Set status upon error
+span.SetStatus(trace.Status{
+	Code:    trace.StatusCodeUnknown,
+	Message: err.Error(),
+})
+```
+
+#### Create an Annotation
+An annotation tells a descriptive story in text of an event that occurred during a span’s lifetime.
+```go
+// 7. Annotate our span to capture metadata about our operation
+span.Annotate([]trace.Attribute{
+	trace.Int64Attribute("bytes to int", num),
+}, "Invoking doWork")
 ```
